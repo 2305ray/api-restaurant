@@ -54,6 +54,15 @@ export class ProductController {
 
             const { name, price } = bodySchema.parse(request.body)
 
+            const product = await knexConfig<ProductRepository>("products")
+                .select()
+                .where({ id })
+                .first()
+
+            if (!product) {
+                throw new AppError("product not exist")
+            }
+
             await knexConfig<ProductRepository>("products")
                 .update({ name, price, updated_at: knexConfig.fn.now() })
                 .where({ id })
@@ -63,4 +72,28 @@ export class ProductController {
             next(error)
         }
     }
+
+    async remove(request: Request, response: Response, next: NextFunction) {
+        try {
+            const id = Zod
+                .string()
+                .transform((value) => Number(value))
+                .refine((value) => !isNaN(value), { message: "id must be a number" })
+                .parse(request.params.id)
+
+            const product = await knexConfig<ProductRepository>("products").select()
+                .where({ id })
+                .first()
+
+            if (!product) {
+                throw new AppError("product not found")
+            }
+            await knexConfig<ProductRepository>("products").delete().where({ id })
+
+            return response.json()
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
