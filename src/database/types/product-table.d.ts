@@ -3,5 +3,5 @@ type ProductRepository = {
     name: string
     price: number
     created_at: number
-    updtaed_at: number
+    updated_at: number
 }
