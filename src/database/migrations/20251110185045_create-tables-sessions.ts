@@ -1,0 +1,19 @@
+import type { Knex } from "knex";
+
+
+export async function up(knex: Knex): Promise<void> {
+    await knex.schema.createTable("sessions", (table) => {
+        table.increments("id").primary(),
+            table.integer("table_id").notNullable().references("id").inTable("tables"), //a referencia é oq existe na tabelatables
+            table.timestamp("opened_at").defaultTo(knex.fn.now()),
+            table.timestamp("closed_at").nullable()
+
+    })
+}
+
+
+
+export async function down(knex: Knex): Promise<void> {
+    await knex.schema.dropTable("tables_sessions")
+}
+
